@@ -4,12 +4,17 @@ A collection of Solidity contracts for asset management.
 Includes an ERC4626 vault with cross-chain bridging, a multisignature wallet, and a timelock controller.
 
 ```mermaid
-graph LR
-  MS[MultiSigWallet]
-  TL[TimeLock]
-  LV[L1Vault]
-  MS -- "owner of" --> TL
-  TL -- "owner of" --> LV
+flowchart LR
+
+  subgraph HyperEVM
+    MS[MultiSigWallet] -- "owner of" --> TL[TimeLock] -- "owner of" --> LV[L1Vault]
+  end
+
+  subgraph HyperCore
+    Spot[Spot] <--> Perp[Perp] <--> CoreVault[Vault]
+  end
+
+  LV <--> |Bridge| Spot
 ```
 
 ### `L1Vault.sol`
@@ -39,7 +44,7 @@ A simple timelock controller where the owner can:
 # Steps
 
 1. Deploy contracts (`deploy.js`)
-2. Send *1 HYPE* to the `contract address` on HypeCore to activate L1 account.
+2. Send *1 HYPE* to the `contract address` on HyperCore to activate L1 account.
 3. Deposit assets into the vault (`1_deposit.js`)
 4. Withdraw assets *after the vault deposit lock-up period* (`2_withdraw.js`)
 5. Bridge assets and finalize *after the vault withdrawal lock-up period* (`3_finalize.js`)
@@ -50,5 +55,5 @@ A simple timelock controller where the owner can:
 
 # Memo
 
-<!-- - To activate your account on HypeCore, after deploying the contract, send funds to the `contract address` to receive them. -->
+<!-- - To activate your account on HyperCore, after deploying the contract, send funds to the `contract address` to receive them. -->
 - Since precompiled calls never fail, you need to separately verify their success on L1.
